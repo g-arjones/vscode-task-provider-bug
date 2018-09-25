@@ -19,8 +19,8 @@ export function activate(_context: vscode.ExtensionContext): void {
             const quickKind: TestTaskDefinition = { type: 'test', task: quickTaskName };
             const slowKind: TestTaskDefinition = { type: 'test', task: slowTaskName };
 
-            return [new vscode.Task(quickKind, scope, quickTaskName, 'test', quickExecution),
-                    new vscode.Task(slowKind, scope, slowTaskName, 'test', slowExecution)];
+            return [new vscode.Task(quickKind, scope, quickTaskName, 'test', quickExecution, []),
+                    new vscode.Task(slowKind, scope, slowTaskName, 'test', slowExecution, [])];
         },
         resolveTask(_task: vscode.Task): vscode.Task | undefined {
             return undefined;

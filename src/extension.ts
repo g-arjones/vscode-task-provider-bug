@@ -11,23 +11,24 @@ interface TestTaskDefinition extends vscode.TaskDefinition {
 export function activate(_context: vscode.ExtensionContext): void {
     taskProvider = vscode.tasks.registerTaskProvider('test', {
         provideTasks: () => {
-            if ((!vscode.workspace.workspaceFolders) || vscode.workspace.workspaceFolders.length < 2) {
-                return [];
-            }
+            const scope = vscode.workspace.workspaceFolders[0];
+            const quickTaskName = "Quick Task"
+            const slowTaskName = "Slow Task"
+            const quickExecution = new vscode.ProcessExecution("/bin/false");
+            const slowExecution = new vscode.ProcessExecution("/bin/sleep", ["10000"]);
+            const quickKind: TestTaskDefinition = { type: 'test', task: quickTaskName };
+            const slowKind: TestTaskDefinition = { type: 'test', task: slowTaskName };
 
-            const taskName = "Dummy Task"
-            const execution = new vscode.ProcessExecution(`/bin/sleep`, ["500"]);
-            // const scope = vscode.workspace.workspaceFolders[0];
-            const scope = vscode.workspace.workspaceFolders[vscode.workspace.workspaceFolders.length - 1];
-            const kind: TestTaskDefinition = {
-                type: 'test',
-                task: taskName
-            };
-            return [new vscode.Task(kind, scope, taskName, 'test', execution)];
+            return [new vscode.Task(quickKind, scope, quickTaskName, 'test', quickExecution),
+                    new vscode.Task(slowKind, scope, slowTaskName, 'test', slowExecution)];
         },
         resolveTask(_task: vscode.Task): vscode.Task | undefined {
             return undefined;
         }
+    });
+
+    vscode.tasks.onDidEndTaskProcess((event: vscode.TaskProcessEndEvent) => {
+        console.log(`Exit code: ${event.exitCode}`);
     });
 }
 
